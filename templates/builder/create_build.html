@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}New Arrow Build - Archery Answers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">New Arrow Build</h2>
+    <p class="card-desc">Building for: <strong>{{ bow.name }}</strong> — {{ bow.ibo_speed }} IBO / {{ bow.draw_weight }}lbs / {{ bow.draw_length }}"</p>
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <span class="field-error">{{ field.errors.0 }}</span>
+            {% endif %}
+            {% if field.help_text %}
+            <span class="unit">{{ field.help_text }}</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-calc">Calculate & Save Build</button>
+    </form>
+
+    <p class="auth-link">Can't find a component? <a href="{% url 'components:submit_shaft' %}">Submit one here</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Arrow Speed Calculator -->
+<section id="speed-calc" class="tab-panel active">
+    <div class="card">
+        <h2 class="card-title">Arrow Speed Calculator</h2>
+        <p class="card-desc">Enter your bow's IBO speed and setup details to find your real-world arrow speed, kinetic energy, and momentum.<br>
+        <strong>Note:</strong> Speed estimate does not account for string accessories (peep sight, D-loop, string dampeners, nock sets). These typically reduce speed by an additional 3-10 FPS depending on total added weight.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label for="ibo-speed">IBO Speed</label>
+                <input type="number" id="ibo-speed" placeholder="e.g. 330" min="200" max="400">
+                <span class="unit">FPS</span>
+            </div>
+            <div class="field">
+                <label for="draw-length">Draw Length</label>
+                <input type="number" id="draw-length" placeholder="e.g. 28" min="20" max="35" step="0.5">
+                <span class="unit">inches</span>
+            </div>
+            <div class="field">
+                <label for="draw-weight">Draw Weight</label>
+                <input type="number" id="draw-weight" placeholder="e.g. 70" min="20" max="100">
+                <span class="unit">lbs</span>
+            </div>
+            <div class="field">
+                <label for="arrow-weight">Total Arrow Weight</label>
+                <input type="number" id="arrow-weight" placeholder="e.g. 425" min="200" max="1000">
+                <span class="unit">grains</span>
+            </div>
+        </div>
+        <button class="btn-calc" onclick="calculateSpeed()">Calculate</button>
+
+        <div id="speed-results" class="results-panel">
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">Arrow Speed</div>
+                    <div class="result-value" id="result-speed">--</div>
+                    <div class="result-unit">FPS</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Kinetic Energy</div>
+                    <div class="result-value" id="result-ke">--</div>
+                    <div class="result-unit">ft-lbs</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Momentum</div>
+                    <div class="result-value" id="result-momentum">--</div>
+                    <div class="result-unit">slug-ft/s</div>
+                </div>
+            </div>
+
+            <div class="animal-ratings" id="animal-ratings">
+                <h3>What Can You Hunt?</h3>
+                {% for animal in thresholds %}
+                <div class="animal-row" data-ke="{{ animal.min_kinetic_energy }}" data-momentum="{{ animal.min_momentum }}">
+                    <span class="animal-icon">{{ animal.icon }}</span>
+                    <span class="animal-name">{{ animal.name }}</span>
+                    <span class="animal-detail">{{ animal.min_kinetic_energy }} ft-lbs / {{ animal.min_momentum }} slug-ft/s</span>
+                    <span class="animal-badge" id="badge-{{ animal.sort_order }}">--</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- KE & Momentum Calculator -->
+<section id="ke-calc" class="tab-panel">
+    <div class="card">
+        <h2 class="card-title">Kinetic Energy & Momentum Calculator</h2>
+        <p class="card-desc">Already know your arrow speed? Enter it here with your arrow weight to get KE and momentum.</p>
+        <div class="form-grid">
+            <div class="field">
+                <label for="ke-arrow-weight">Arrow Weight</label>
+                <input type="number" id="ke-arrow-weight" placeholder="e.g. 425" min="200" max="1000">
+                <span class="unit">grains</span>
+            </div>
+            <div class="field">
+                <label for="ke-arrow-speed">Arrow Speed</label>
+                <input type="number" id="ke-arrow-speed" placeholder="e.g. 275" min="100" max="400">
+                <span class="unit">FPS</span>
+            </div>
+        </div>
+        <button class="btn-calc" onclick="calculateKE()">Calculate</button>
+
+        <div id="ke-results" class="results-panel">
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">Kinetic Energy</div>
+                    <div class="result-value" id="ke-result-ke">--</div>
+                    <div class="result-unit">ft-lbs</div>
+                </div>
+                <div class="result-box">
+                    <div class="result-label">Momentum</div>
+                    <div class="result-value" id="ke-result-momentum">--</div>
+                    <div class="result-unit">slug-ft/s</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Animal Reference Chart -->
+<section id="animal-chart" class="tab-panel">
+    <div class="card">
+        <h2 class="card-title">Animal Reference Chart</h2>
+        <p class="card-desc">Minimum recommended kinetic energy and momentum values for ethical hunting.</p>
+        <table class="ref-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Animal</th>
+                    <th>Min Kinetic Energy</th>
+                    <th>Min Momentum</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for animal in thresholds %}
+                <tr>
+                    <td>{{ animal.icon }}</td>
+                    <td>{{ animal.name }}</td>
+                    <td>{{ animal.min_kinetic_energy }} ft-lbs</td>
+                    <td>{{ animal.min_momentum }} slug-ft/s</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="tab-panel">
+    <div class="card">
+        <h2 class="card-title">Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <h3>What is IBO speed?</h3>
+            <p>IBO speed is the speed rating assigned by the International Bowhunting Organization. It's measured at 70 lbs draw weight, 30 inch draw length, and a 350 grain arrow with no string accessories. Your real-world speed will be lower based on your actual setup.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>How much speed do I lose per inch of draw length?</h3>
+            <p>Approximately 10 FPS per inch below 30 inches. So if your draw length is 28 inches, expect to lose about 20 FPS from the IBO rating.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>What matters more — kinetic energy or momentum?</h3>
+            <p>Kinetic energy measures the total energy delivered on impact, while momentum measures penetration potential. Many experienced hunters trust momentum more for predicting penetration, especially on heavy-boned animals. Ideally you want both numbers above the minimum for your target animal.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>How much speed do I lose for arrow weight?</h3>
+            <p>Roughly 1.5 FPS for every 5 grains over the 350 grain IBO standard. A 450 grain arrow would cost you about 30 FPS compared to IBO.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3>What is a good arrow weight for hunting?</h3>
+            <p>The general rule is a minimum of 5 grains per pound of draw weight. At 70 lbs, that's 350 grains minimum. Most serious hunters shoot 400-500 grains for whitetail and 450-600+ grains for elk. Heavier arrows penetrate better but fly slower with more arc.</p>
+        </div>
+    </div>
+</section>
+<!-- Submit Component -->
+{% if user.is_authenticated %}
+<section id="submit-component" class="tab-panel">
+    <div class="card">
+        <h2 class="card-title">Submit a Component</h2>
+        <p class="card-desc">Can't find your gear in the database? Add it here. Your submission is available in your builds immediately.</p>
+        <div class="submit-grid">
+            <a href="{% url 'components:submit_shaft' %}" class="submit-card">
+                <span class="submit-icon">🏹</span>
+                <span class="submit-label">Arrow Shaft</span>
+                <span class="submit-desc">Brand, model, spine, GPI</span>
+            </a>
+            <a href="{% url 'components:submit_vane' %}" class="submit-card">
+                <span class="submit-icon">🪶</span>
+                <span class="submit-label">Vane / Fletching</span>
+                <span class="submit-desc">Brand, model, weight, height</span>
+            </a>
+            <a href="{% url 'components:submit_nock' %}" class="submit-card">
+                <span class="submit-icon">🔘</span>
+                <span class="submit-label">Nock</span>
+                <span class="submit-desc">Brand, type, weight</span>
+            </a>
+            <a href="{% url 'components:submit_insert' %}" class="submit-card">
+                <span class="submit-icon">🔩</span>
+                <span class="submit-label">Insert / Outsert</span>
+                <span class="submit-desc">Brand, type, weight, material</span>
+            </a>
+            <a href="{% url 'components:submit_broadhead' %}" class="submit-card">
+                <span class="submit-icon">🗡️</span>
+                <span class="submit-label">Broadhead</span>
+                <span class="submit-desc">Brand, type, weight, cut diameter</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Archery Answers{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="card-title">Log In</h2>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <div class="field">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <button type="submit" class="btn-calc">Log In</button>
+    </form>
+    <p class="auth-link">Don't have an account? <a href="{% url 'accounts:register' %}">Register</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Arrow Builder - Archery Answers{% endblock %}
+
+{% block content %}
+<!-- Bows Section -->
+<div class="card">
+    <h2 class="card-title">My Bows</h2>
+    {% if bows %}
+    <div class="bow-list">
+        {% for bow in bows %}
+        <div class="bow-card">
+            <div class="bow-info">
+                <h3>{{ bow.name }}</h3>
+                <span class="bow-specs">{{ bow.ibo_speed }} IBO &bull; {{ bow.draw_weight }}lbs &bull; {{ bow.draw_length }}"</span>
+            </div>
+            <a href="{% url 'builder:create_build' bow.id %}" class="btn-calc btn-small">New Build</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="card-desc">No bows added yet. Add your first bow to start building arrows.</p>
+    {% endif %}
+    <a href="{% url 'builder:create_bow' %}" class="btn-calc" style="display: inline-block; margin-top: 1rem;">Add Bow</a>
+</div>
+
+<!-- Builds Section -->
+{% if builds %}
+<div class="card">
+    <h2 class="card-title">My Arrow Builds</h2>
+    {% for build in builds %}
+    <div class="build-card">
+        <div class="build-header">
+            <h3>{{ build.name }}</h3>
+            <span class="build-bow">{{ build.bow.name }}</span>
+        </div>
+        <div class="build-components">
+            {% if build.shaft %}
+            <span class="build-comp">🏹 {{ build.shaft }}</span>
+            {% endif %}
+            {% if build.broadhead %}
+            <span class="build-comp">🗡️ {{ build.broadhead }}</span>
+            {% endif %}
+            {% if build.vane %}
+            <span class="build-comp">🪶 {{ build.vane }} x{{ build.num_vanes }}</span>
+            {% endif %}
+            <span class="build-comp">📏 {{ build.arrow_length }}"</span>
+        </div>
+        <div class="results-grid" style="margin-top: 1rem;">
+            <div class="result-box">
+                <div class="result-label">Total Weight</div>
+                <div class="result-value">{{ build.total_arrow_weight|floatformat:1 }}</div>
+                <div class="result-unit">grains</div>
+            </div>
+            <div class="result-box">
+                <div class="result-label">Speed</div>
+                <div class="result-value">{{ build.arrow_speed|floatformat:1 }}</div>
+                <div class="result-unit">FPS</div>
+            </div>
+            <div class="result-box">
+                <div class="result-label">Kinetic Energy</div>
+                <div class="result-value">{{ build.kinetic_energy|floatformat:1 }}</div>
+                <div class="result-unit">ft-lbs</div>
+            </div>
+            <div class="result-box">
+                <div class="result-label">Momentum</div>
+                <div class="result-value">{{ build.momentum|floatformat:2 }}</div>
+                <div class="result-unit">slug-ft/s</div>
+            </div>
+        </div>
+
+        <!-- Animal Ratings -->
+        <div class="animal-ratings" style="margin-top: 1rem;">
+            {% for animal in thresholds %}
+            <div class="animal-row">
+                <span class="animal-icon">{{ animal.icon }}</span>
+                <span class="animal-name">{{ animal.name }}</span>
+                {% if build.kinetic_energy >= animal.min_kinetic_energy and build.momentum >= animal.min_momentum %}
+                <span class="animal-badge badge-pass">Pass</span>
+                {% elif build.kinetic_energy >= animal.min_kinetic_energy or build.momentum >= animal.min_momentum %}
+                <span class="animal-badge badge-marginal">Marginal</span>
+                {% else %}
+                <span class="animal-badge badge-fail">Insufficient</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
