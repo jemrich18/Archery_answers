@@ -24,6 +24,9 @@ class ArrowBuildForm(forms.ModelForm):
             'arrow_length': forms.NumberInput(attrs={'placeholder': 'e.g. 28', 'min': 20, 'max': 35, 'step': 0.25}),
             'num_vanes': forms.NumberInput(attrs={'min': 3, 'max': 4}),
         }
+        help_texts = {
+            'arrow_length': 'Measured carbon to carbon - does not include inserts, outsert or nock',
+        }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)

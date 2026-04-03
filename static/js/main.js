@@ -1,13 +1,42 @@
 // ===== TAB SWITCHING =====
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Update buttons
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
 
-        // Update panels
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById(btn.dataset.tab).classList.add('active');
+    // Check URL for tab parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+
+    if (activeTab && document.getElementById(activeTab)) {
+        // Activate the tab from URL
+        panels.forEach(p => p.classList.remove('active'));
+        tabs.forEach(t => t.classList.remove('active'));
+        document.getElementById(activeTab).classList.add('active');
+        tabs.forEach(t => {
+            if (t.dataset.tab === activeTab) t.classList.add('active');
+        });
+    } else if (panels.length > 0) {
+        // Default to first tab if on home page
+        const hasActive = document.querySelector('.tab-panel.active');
+        if (!hasActive) {
+            panels[0].classList.add('active');
+            tabs[0].classList.add('active');
+        }
+    }
+
+    // Handle tab clicks on the home page without page reload
+    tabs.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const panel = document.getElementById(btn.dataset.tab);
+            if (panel) {
+                e.preventDefault();
+                panels.forEach(p => p.classList.remove('active'));
+                tabs.forEach(t => t.classList.remove('active'));
+                panel.classList.add('active');
+                btn.classList.add('active');
+            }
+            // If panel doesn't exist (like builder), let the link navigate normally
+        });
     });
 });
 

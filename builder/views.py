@@ -43,7 +43,7 @@ def create_build(request, bow_id):
             build.user = request.user
             build.bow = bow
             build.save()  # This triggers calculate() in the model
-            messages.success(request, f'Build "{build.name}" created! Speed: {build.arrow_speed:.1f} FPS | KE: {build.kinetic_energy:.1f} ft-lbs')
+            messages.success(request, f'Build "{build.name}" created! Speed: {build.arrow_speed:.1f} FPS | KE: {build.kinetic_energy:.1f} ft-lbs | FOC: {build.foc:.1f}%')
             return redirect('builder:home')
     else:
         form = ArrowBuildForm(user=request.user)

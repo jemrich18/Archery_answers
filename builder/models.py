@@ -76,6 +76,24 @@ class ArrowBuild(models.Model):
         # Momentum: p = (mv) / 225120
         self.momentum = (self.total_arrow_weight * self.arrow_speed) / 225120
 
+        # FOC estimation
+        if self.total_arrow_weight > 0 and self.arrow_length > 0:
+            front_weight = insert_weight + broadhead_weight
+            vane_position = 1.5  # inches from nock end
+            
+            # Center of mass calculation (measured from nock end)
+            balance_point = (
+                (front_weight * self.arrow_length) +
+                (shaft_weight * (self.arrow_length / 2)) +
+                (vane_weight * vane_position) +
+                (nock_weight * 0)
+            ) / self.total_arrow_weight
+
+            midpoint = self.arrow_length / 2
+            self.foc = ((balance_point - midpoint) / self.arrow_length) * 100
+        else:
+            self.foc = 0
+
     def save(self, *args, **kwargs):
         if self.shaft and self.bow:
             self.calculate()
