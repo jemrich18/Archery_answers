@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py collectstatic --noinput && python manage.py seed_thresholds && gunicorn core.wsgi --bind 0.0.0.0:$PORT
+web: python manage.py migrate && python manage.py collectstatic --noinput && python manage.py seed_thresholds && python manage.py create_admin && gunicorn core.wsgi --bind 0.0.0.0:$PORT
